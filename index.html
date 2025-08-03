@@ -9,7 +9,7 @@
     rel="stylesheet"
   />
   <style>
-    /* (Mismo CSS que tienes, sin cambios) */
+    /* El mismo CSS de antes... */
     * {
       margin: 0;
       padding: 0;
@@ -20,8 +20,7 @@
       background-color: #ffffff;
       color: #000000;
       min-height: 100vh;
-      position: relative;
-      padding-bottom: 120px; /* espacio para footer */
+      padding-bottom: 40px;
     }
     header {
       background-color: #000000;
@@ -37,7 +36,8 @@
       letter-spacing: 2px;
     }
     section {
-      padding: 60px 20px;
+      padding-top: 80px;
+      padding-bottom: 20px;
       max-width: 1000px;
       margin: auto;
       text-align: center;
@@ -99,23 +99,30 @@
       max-height: 1500px;
       opacity: 1;
       margin-top: 30px;
+      overflow: visible;
+      min-height: 400px;
+      padding-bottom: 40px;
     }
     footer {
       background-color: #000000;
       color: white;
       text-align: center;
       padding: 20px;
-      position: absolute;
-      width: 100%;
-      bottom: 0;
-      left: 0;
+      margin-top: 20px;
     }
     /* Catálogo */
+    #catalogo {
+      padding: 40px 20px;
+    }
     .catalogo {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 30px;
-      padding: 20px 0 40px;
+      padding: 20px;
+      background-color: #fefefe;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-top: 20px;
     }
     .producto {
       border: 1px solid #ccc;
@@ -135,7 +142,7 @@
     }
     .producto img {
       width: 100%;
-      max-height: 220px;
+      max-height: 280px;
       object-fit: contain;
       user-select: none;
     }
@@ -151,7 +158,7 @@
     }
     .precio {
       font-size: 18px;
-      color: #b8860b; /* dorado fuerte */
+      color: #b8860b;
       margin-bottom: 8px;
       font-weight: 700;
     }
@@ -172,7 +179,32 @@
     .order-btn:hover {
       background-color: #333333;
     }
-    /* Modal grande del producto */
+    /* Paginación */
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+      user-select: none;
+    }
+    .pagination button {
+      background-color: black;
+      color: white;
+      border: none;
+      margin: 0 5px;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+    .pagination button:hover {
+      background-color: #333333;
+    }
+    .pagination button.active {
+      background-color: #b8860b;
+      cursor: default;
+    }
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -303,6 +335,7 @@
     <div id="catalogo" class="toggle-section">
       <h2>Catálogo</h2>
       <div class="catalogo"></div>
+      <div class="pagination"></div>
     </div>
   </section>
 
@@ -326,8 +359,7 @@
       {
         nombre: "F1",
         imagenes: [
-          "https://i.postimg.cc/Hkx9fkfT/image.png",
-          "https://i.postimg.cc/Hkx9fkfT/image.png",
+          "https://i.postimg.cc/Hkx9fkfT/image.png"
         ],
       },
       {
@@ -421,6 +453,9 @@
       },
     ];
 
+    const productosPorPagina = 6;
+    let paginaActual = 1;
+
     function toggleSection(id) {
       const section = document.getElementById(id);
       const isOpen = section.classList.contains("open");
@@ -432,7 +467,6 @@
       }
     }
 
-    // Abrir modal con galería
     function abrirModal(producto) {
       const modal = document.getElementById("modalProducto");
       const mainImg = document.getElementById("modalImagenPrincipal");
@@ -458,19 +492,16 @@
       modal.classList.add("open");
     }
 
-    // Cerrar modal
     document.querySelector(".modal-close").onclick = () => {
       document.getElementById("modalProducto").classList.remove("open");
     };
 
-    // Cerrar modal al dar click fuera del contenido
     document.getElementById("modalProducto").onclick = (e) => {
       if (e.target === e.currentTarget) {
         e.currentTarget.classList.remove("open");
       }
     };
 
-    // Función para enviar mensaje WhatsApp con pedido
     function orderProduct(nombre) {
       const telefono = "522207435049";
       const mensaje = encodeURIComponent(
@@ -479,21 +510,25 @@
       window.open(`https://wa.me/${telefono}?text=${mensaje}`, "_blank");
     }
 
-    // Renderizar catálogo con evento clic para abrir modal
-    document.addEventListener("DOMContentLoaded", () => {
+    function renderizarCatalogo() {
       const catalogoDiv = document.querySelector(".catalogo");
+      const paginacionDiv = document.querySelector(".pagination");
+      catalogoDiv.innerHTML = "";
+      paginacionDiv.innerHTML = "";
 
-      productos.forEach((producto) => {
+      const inicio = (paginaActual - 1) * productosPorPagina;
+      const fin = inicio + productosPorPagina;
+      const productosPagina = productos.slice(inicio, fin);
+
+      productosPagina.forEach((producto) => {
         const div = document.createElement("div");
         div.className = "producto";
 
-        // Imagen principal (primer imagen)
         const img = document.createElement("img");
         img.src = producto.imagenes[0];
         img.alt = producto.nombre;
         img.onclick = () => abrirModal(producto);
 
-        // Info producto
         const infoDiv = document.createElement("div");
         infoDiv.className = "info";
 
@@ -522,8 +557,25 @@
 
         catalogoDiv.appendChild(div);
       });
+
+      const totalPaginas = Math.ceil(productos.length / productosPorPagina);
+      for (let i = 1; i <= totalPaginas; i++) {
+        const btnPagina = document.createElement("button");
+        btnPagina.textContent = i;
+        if (i === paginaActual) btnPagina.classList.add("active");
+        btnPagina.onclick = () => {
+          paginaActual = i;
+          renderizarCatalogo();
+          document.getElementById("catalogo").scrollIntoView({behavior: "smooth"});
+        };
+        paginacionDiv.appendChild(btnPagina);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderizarCatalogo();
     });
   </script>
 </body>
+</html>
 
-</html>      
