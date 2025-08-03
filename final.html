@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ars 3D</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* (Mismo CSS que tienes, sin cambios) */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Playfair Display", serif;
+    }
+    body {
+      background-color: #ffffff;
+      color: #000000;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 120px; /* espacio para footer */
+    }
+    header {
+      background-color: #000000;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+    .brand {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    section {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: auto;
+      text-align: center;
+    }
+    #inicio img {
+      max-width: 300px;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      animation: fadeZoomIn 1.2s ease-out;
+    }
+    @keyframes fadeZoomIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      background: black;
+      color: white;
+      padding: 12px 24px;
+      margin: 10px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 16px;
+      transition: background 0.3s ease;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #333333;
+    }
+    .toggle-section {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.6s ease, opacity 0.6s ease;
+      opacity: 0;
+    }
+    .toggle-section.open {
+      max-height: 1500px;
+      opacity: 1;
+      margin-top: 30px;
+    }
+    footer {
+      background-color: #000000;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+    }
+    /* Catálogo */
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 30px;
+      padding: 20px 0 40px;
+    }
+    .producto {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      background: white;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .producto:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+    .producto img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      user-select: none;
+    }
+    .info {
+      padding: 15px;
+      text-align: center;
+      width: 100%;
+    }
+    .nombre {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .precio {
+      font-size: 18px;
+      color: #b8860b; /* dorado fuerte */
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .order-btn {
+      background-color: black;
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+      font-weight: 700;
+      user-select: none;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .order-btn:hover {
+      background-color: #333333;
+    }
+    /* Modal grande del producto */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    .modal.open {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+    .modal-main-image {
+      flex: 3;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-main-image img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+      user-select: none;
+    }
+    .modal-thumbnails {
+      flex: 1;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 15px;
+      gap: 10px;
+      overflow-y: auto;
+      border-left: 1px solid #ddd;
+      max-height: 80vh;
+    }
+    .modal-thumbnails img {
+      width: 100%;
+      cursor: pointer;
+      border-radius: 6px;
+      object-fit: contain;
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease;
+      user-select: none;
+    }
+    .modal-thumbnails img.selected {
+      border-color: #b8860b;
+    }
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: black;
+      color: white;
+      font-size: 24px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 36px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+      box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Ars 3D</div>
+  </header>
+
+  <section id="inicio">
+    <img
+      src="https://i.postimg.cc/zGTwmz5x/c8b9ef50-d890-4078-b839-40428c657508.jpg"
+      alt="Logo Ars 3D"
+    />
+    <h1>Bienvenido a Ars 3D</h1>
+    <p>Llaveros únicos y personalizados con impresión 3D. Calidad, detalle y estilo.</p>
+    <div>
+      <button class="btn" onclick="toggleSection('pedidos')">Pedidos</button>
+      <button class="btn" onclick="toggleSection('contacto')">Contacto</button>
+      <button class="btn" onclick="toggleSection('catalogo')">Catálogo</button>
+    </div>
+
+    <div id="pedidos" class="toggle-section">
+      <h2>¿Cómo hacer tu pedido?</h2>
+      <p>
+        Contáctanos con el diseño que quieres o elige uno de nuestro catálogo. Te
+        enviaremos una cotización y comenzamos a crear tu llavero único.
+      </p>
+      <p style="font-weight: bold; color: #990000;">
+        ⚠️ Los llaveros personalizados (fuera del catálogo) tienen un costo
+        adicional.
+      </p>
+    </div>
+
+    <div id="contacto" class="toggle-section">
+      <h2>Contacto</h2>
+      <p>
+        📷 Instagram:
+        <a href="https://instagram.com" target="_blank">@ars3d</a>
+      </p>
+      <p>
+        📞 WhatsApp:
+        <a href="https://wa.me/522207435049" target="_blank">+52 220 743 5049</a>
+      </p>
+      <p>📧 Email: <a href="mailto:ars3d1318@gmail.com">ars3d1318@gmail.com</a></p>
+    </div>
+
+    <div id="catalogo" class="toggle-section">
+      <h2>Catálogo</h2>
+      <div class="catalogo"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Ars 3D. Todos los derechos reservados.</p>
+  </footer>
+
+  <!-- Modal Producto -->
+  <div id="modalProducto" class="modal">
+    <div class="modal-content">
+      <div class="modal-main-image">
+        <img src="" alt="Imagen grande del producto" id="modalImagenPrincipal" />
+      </div>
+      <div class="modal-thumbnails"></div>
+      <div class="modal-close" title="Cerrar">&times;</div>
+    </div>
+  </div>
+
+  <script>
+    const productos = [
+      {
+        nombre: "F1",
+        imagenes: [
+          "https://i.postimg.cc/Hkx9fkfT/image.png",
+          "https://i.postimg.cc/Hkx9fkfT/image.png",
+        ],
+      },
+      {
+        nombre: "Mapache",
+        imagenes: [
+          "https://i.postimg.cc/qRdnMJZh/image.png",
+          "https://i.postimg.cc/Wp5DxwjJ/image.png",
+          "https://i.postimg.cc/fbMDw1fW/image.png",
+        ],
+      },
+      {
+        nombre: "Mug Aromático",
+        imagenes: [
+          "https://i.postimg.cc/YCMC94pw/image.png"
+        ],
+      },
+      {
+        nombre: "Ajolote",
+        imagenes: [
+          "https://i.postimg.cc/ht2ctpy9/image.png",
+          "https://i.postimg.cc/wM5d8VRR/image.png",
+          "https://i.postimg.cc/8PDSdqxR/image.png",
+        ],
+      },
+      {
+        nombre: "Furia Luminosa",
+        imagenes: [
+          "https://i.postimg.cc/wj4Yp3M2/image.png",
+          "https://i.postimg.cc/wj4Yp3M2/image.png",
+          "https://i.postimg.cc/NfNzyStf/image.png",
+        ],
+      },
+      {
+        nombre: "Oso Polar",
+        imagenes: [
+          "https://i.postimg.cc/5tz7RtC6/image.png",
+          "https://i.postimg.cc/zGb0yfp0/image.png",
+        ],
+      },
+      {
+        nombre: "Dinosaurio",
+        imagenes: [
+          "https://i.postimg.cc/Bbb2RhVM/image.png"
+        ],
+      },
+      {
+        nombre: "Hello Kitty",
+        imagenes: [
+          "https://i.postimg.cc/SRZbxKVm/image.png",
+          "https://i.postimg.cc/T35vTfbX/image.png",
+          "https://i.postimg.cc/T35vTfbX/image.png",
+        ],
+      },
+      {
+        nombre: "Cinnamoroll",
+        imagenes: [
+          "https://i.postimg.cc/L6qb1v8t/image.png",
+          "https://i.postimg.cc/cJW9PSMh/image.png",
+          "https://i.postimg.cc/jdVFyPwB/image.png",
+        ],
+      },
+      {
+        nombre: "Kuromi",
+        imagenes: [
+          "https://i.postimg.cc/6ptbmKh0/image.png",
+          "https://i.postimg.cc/6pcbsPjN/image.png",
+          "https://i.postimg.cc/TPP7TcF5/image.png",
+        ],
+      },
+      {
+        nombre: "Shark",
+        imagenes: [
+          "https://i.postimg.cc/Vst7svGg/image.png",
+          "https://i.postimg.cc/50hnqW08/image.png",
+        ],
+      },
+      {
+        nombre: "Pascal",
+        imagenes: [
+          "https://i.postimg.cc/jSMc372x/image.png",
+          "https://i.postimg.cc/7PSV8chQ/image.png",
+          "https://i.postimg.cc/gkDHrZvV/image.png",
+        ],
+      },
+      {
+        nombre: "Furia Nocturna",
+        imagenes: [
+          "https://i.postimg.cc/V6QCKfqs/image.png",
+          "https://i.postimg.cc/0QYJ3TnY/image.png",
+        ],
+      },
+    ];
+
+    function toggleSection(id) {
+      const section = document.getElementById(id);
+      const isOpen = section.classList.contains("open");
+      document.querySelectorAll(".toggle-section").forEach((sec) => {
+        sec.classList.remove("open");
+      });
+      if (!isOpen) {
+        section.classList.add("open");
+      }
+    }
+
+    // Abrir modal con galería
+    function abrirModal(producto) {
+      const modal = document.getElementById("modalProducto");
+      const mainImg = document.getElementById("modalImagenPrincipal");
+      const thumbnailsDiv = modal.querySelector(".modal-thumbnails");
+
+      mainImg.src = producto.imagenes[0];
+      thumbnailsDiv.innerHTML = "";
+
+      producto.imagenes.forEach((src, index) => {
+        const thumb = document.createElement("img");
+        thumb.src = src;
+        if (index === 0) thumb.classList.add("selected");
+        thumb.onclick = () => {
+          mainImg.src = src;
+          thumbnailsDiv.querySelectorAll("img").forEach((img) => {
+            img.classList.remove("selected");
+          });
+          thumb.classList.add("selected");
+        };
+        thumbnailsDiv.appendChild(thumb);
+      });
+
+      modal.classList.add("open");
+    }
+
+    // Cerrar modal
+    document.querySelector(".modal-close").onclick = () => {
+      document.getElementById("modalProducto").classList.remove("open");
+    };
+
+    // Cerrar modal al dar click fuera del contenido
+    document.getElementById("modalProducto").onclick = (e) => {
+      if (e.target === e.currentTarget) {
+        e.currentTarget.classList.remove("open");
+      }
+    };
+
+    // Función para enviar mensaje WhatsApp con pedido
+    function orderProduct(nombre) {
+      const telefono = "522207435049";
+      const mensaje = encodeURIComponent(
+        `Hola, quiero pedir el llavero "${nombre}" del catálogo Ars 3D.`
+      );
+      window.open(`https://wa.me/${telefono}?text=${mensaje}`, "_blank");
+    }
+
+    // Renderizar catálogo con evento clic para abrir modal
+    document.addEventListener("DOMContentLoaded", () => {
+      const catalogoDiv = document.querySelector(".catalogo");
+
+      productos.forEach((producto) => {
+        const div = document.createElement("div");
+        div.className = "producto";
+
+        // Imagen principal (primer imagen)
+        const img = document.createElement("img");
+        img.src = producto.imagenes[0];
+        img.alt = producto.nombre;
+        img.onclick = () => abrirModal(producto);
+
+        // Info producto
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "info";
+
+        const nombreDiv = document.createElement("div");
+        nombreDiv.className = "nombre";
+        nombreDiv.textContent = producto.nombre;
+
+        const precioDiv = document.createElement("div");
+        precioDiv.className = "precio";
+        precioDiv.textContent = "45 MXN";
+
+        const btn = document.createElement("button");
+        btn.className = "order-btn";
+        btn.textContent = "¡Lo quiero!";
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          orderProduct(producto.nombre);
+        };
+
+        infoDiv.appendChild(nombreDiv);
+        infoDiv.appendChild(precioDiv);
+        infoDiv.appendChild(btn);
+
+        div.appendChild(img);
+        div.appendChild(infoDiv);
+
+        catalogoDiv.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>      
